@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment;
 public class MyFragment extends Fragment {
 
     private final int id;
+    private NotificationManager notificationManager;
 
     public MyFragment(int id) {
         this.id = id;
@@ -44,6 +45,7 @@ public class MyFragment extends Fragment {
             if (ViewPagerAdapter.countOfFragments > 0) {
                 if (fragmentCallback != null) {
                     fragmentCallback.deleteFragment(id);
+                    notificationManager.cancel(id);
                 }
             }
         });
@@ -54,15 +56,15 @@ public class MyFragment extends Fragment {
             Notification notification;
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                 NotificationChannel channel = new NotificationChannel(String.valueOf(id), String.valueOf(id), NotificationManager.IMPORTANCE_DEFAULT);
-                NotificationManager notificationManager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
                 notificationManager.createNotificationChannel(channel);
                 notification = new Notification.Builder(getContext(), String.valueOf(id))
                         .setContentTitle(getString(R.string.notification_title)).setContentText(getString(R.string.notification_content)+" "+id)
                         .setAutoCancel(true)
                         .setSmallIcon(R.drawable.ic_message).setContentIntent(pendingIntent).build();
                 notificationManager.notify(id, notification);
-            }
-        });
+            } //открывается не тот фрагмент который соответствует но тот чей ноутификейшн был создан последним. я не понял чего.
+        });   //что-то с интентом или с тем что это инстанс одного и того же фрагмента. 
         if (ViewPagerAdapter.countOfFragments <= 1) {
             view.findViewById(R.id.fab_fragment_remove).setVisibility(View.GONE);
         }
